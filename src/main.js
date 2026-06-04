@@ -13,9 +13,13 @@ const gridSize = 20;
 const tileCount = canvas.width / gridSize;
 const startPosition = { x: 8, y: 14 };
 const tickMs = 105;
+const movingPoopMoveEvery = 7;
 
 let snake;
 let food;
+let movingPoop;
+let movingPoopDirection;
+let movingPoopTicks;
 let direction;
 let nextDirection;
 let score;
@@ -35,6 +39,9 @@ function resetGame() {
   score = 0;
   lives = 3;
   food = createFood();
+  movingPoop = createFood([food]);
+  movingPoopDirection = randomDirection();
+  movingPoopTicks = 0;
   status = "ready";
   stopLoop();
   updateHud();
@@ -75,6 +82,7 @@ function stopLoop() {
 
 function step() {
   direction = nextDirection;
+  moveMovingPoop();
 
   const head = {
     x: snake[0].x + direction.x,
@@ -88,11 +96,17 @@ function step() {
 
   snake.unshift(head);
 
-  if (head.x === food.x && head.y === food.y) {
-    score += 10;
+  const ateFood = sameCell(head, food);
+  const ateMovingPoop = sameCell(head, movingPoop);
+
+  if (ateFood || ateMovingPoop) {
+    score += ateMovingPoop ? 30 : 10;
+    food = ateFood ? createFood([movingPoop]) : food;
+    movingPoop = ateMovingPoop ? createFood([food]) : movingPoop;
+    movingPoopDirection = ateMovingPoop ? randomDirection() : movingPoopDirection;
+    movingPoopTicks = ateMovingPoop ? 0 : movingPoopTicks;
     bestScore = Math.max(bestScore, score);
     localStorage.setItem("pinkSnakeBest", String(bestScore));
-    food = createFood();
   } else {
     snake.pop();
   }
@@ -121,10 +135,13 @@ function loseLife() {
   direction = { x: 1, y: 0 };
   nextDirection = { x: 1, y: 0 };
   food = createFood();
+  movingPoop = createFood([food]);
+  movingPoopDirection = randomDirection();
+  movingPoopTicks = 0;
   draw();
 }
 
-function createFood() {
+function createFood(blockedCells = []) {
   let candidate;
 
   do {
@@ -132,9 +149,70 @@ function createFood() {
       x: Math.floor(Math.random() * tileCount),
       y: Math.floor(Math.random() * tileCount),
     };
-  } while (snake?.some((part) => part.x === candidate.x && part.y === candidate.y));
+  } while (
+    snake?.some((part) => sameCell(part, candidate)) ||
+    blockedCells.some((cell) => sameCell(cell, candidate))
+  );
 
   return candidate;
+}
+
+function moveMovingPoop() {
+  movingPoopTicks += 1;
+
+  if (movingPoopTicks < movingPoopMoveEvery) {
+    return;
+  }
+
+  movingPoopTicks = 0;
+
+  const possibleDirections = shuffleDirections([
+    movingPoopDirection,
+    randomDirection(),
+    { x: 0, y: -1 },
+    { x: 0, y: 1 },
+    { x: -1, y: 0 },
+    { x: 1, y: 0 },
+  ]);
+
+  const nextSpot = possibleDirections
+    .map((move) => ({
+      x: movingPoop.x + move.x,
+      y: movingPoop.y + move.y,
+      direction: move,
+    }))
+    .find(
+      (spot) =>
+        !hitsWall(spot) &&
+        !sameCell(spot, food) &&
+        !snake.some((part) => sameCell(part, spot)),
+    );
+
+  if (nextSpot) {
+    movingPoop = { x: nextSpot.x, y: nextSpot.y };
+    movingPoopDirection = nextSpot.direction;
+  } else {
+    movingPoopDirection = randomDirection();
+  }
+}
+
+function randomDirection() {
+  const directions = [
+    { x: 0, y: -1 },
+    { x: 0, y: 1 },
+    { x: -1, y: 0 },
+    { x: 1, y: 0 },
+  ];
+
+  return directions[Math.floor(Math.random() * directions.length)];
+}
+
+function shuffleDirections(directions) {
+  return [...directions].sort(() => Math.random() - 0.5);
+}
+
+function sameCell(a, b) {
+  return a?.x === b?.x && a?.y === b?.y;
 }
 
 function hitsWall(point) {
@@ -176,6 +254,7 @@ function draw() {
 
   drawGrid();
   drawFood();
+  drawMovingPoop();
   drawSnake();
 }
 
@@ -244,15 +323,47 @@ function drawFood() {
   const centerX = food.x * gridSize + gridSize / 2;
   const centerY = food.y * gridSize + gridSize / 2;
 
-  ctx.fillStyle = "#8ee86f";
+  drawPoop(centerX, centerY, {
+    base: "#7a4424",
+    highlight: "#a46838",
+    eyes: "#fff8fb",
+  });
+}
+
+function drawMovingPoop() {
+  const centerX = movingPoop.x * gridSize + gridSize / 2;
+  const centerY = movingPoop.y * gridSize + gridSize / 2;
+
+  drawPoop(centerX, centerY, {
+    base: "#d79a2b",
+    highlight: "#ffd36a",
+    eyes: "#2a1020",
+  });
+
+  ctx.strokeStyle = "rgba(255, 211, 106, 0.55)";
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(centerX, centerY, 7, 0, Math.PI * 2);
+  ctx.arc(centerX, centerY, 9, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+function drawPoop(centerX, centerY, colors) {
+  ctx.fillStyle = colors.base;
+  ctx.beginPath();
+  ctx.arc(centerX - 4, centerY + 4, 5.5, 0, Math.PI * 2);
+  ctx.arc(centerX + 4, centerY + 4, 5.5, 0, Math.PI * 2);
+  ctx.arc(centerX, centerY, 6.2, 0, Math.PI * 2);
+  ctx.arc(centerX + 1, centerY - 6, 4.8, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = "#ffd36a";
+  ctx.fillStyle = colors.highlight;
   ctx.beginPath();
-  ctx.arc(centerX - 2, centerY - 2, 2.5, 0, Math.PI * 2);
+  ctx.arc(centerX + 2, centerY - 8, 1.6, 0, Math.PI * 2);
   ctx.fill();
+
+  ctx.fillStyle = colors.eyes;
+  ctx.fillRect(centerX - 4.2, centerY - 0.5, 2, 2);
+  ctx.fillRect(centerX + 2.2, centerY - 0.5, 2, 2);
 }
 
 function roundedRect(x, y, width, height, radius) {
