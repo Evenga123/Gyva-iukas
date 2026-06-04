@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="lt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rožinė gyvatėlė</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="game-shell" aria-label="Rožinės gyvatėlės žaidimas">
+      <section class="game-panel">
+        <div class="hud" aria-live="polite">
+          <div>
+            <span class="hud-label">Taškai</span>
+            <strong id="score">0</strong>
+          </div>
+          <div>
+            <span class="hud-label">Rekordas</span>
+            <strong id="bestScore">0</strong>
+          </div>
+          <div>
+            <span class="hud-label">Gyvybės</span>
+            <strong id="lives" class="lives">♥ ♥ ♥</strong>
+          </div>
+        </div>
+
+        <div class="board-wrap">
+          <canvas id="gameCanvas" width="560" height="560" aria-label="Žaidimo lenta"></canvas>
+          <div id="overlay" class="overlay">
+            <h1>Rožinė gyvatėlė</h1>
+            <p id="overlayText">Spausk rodyklę arba mygtuką Start.</p>
+            <button id="startButton" type="button">Start</button>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="pauseButton" type="button" aria-label="Pauzė">Pauzė</button>
+          <button id="restartButton" type="button" aria-label="Pradėti iš naujo">Iš naujo</button>
+        </div>
+      </section>
+    </main>
+
+    <script defer src="./src/main.js"></script>
+  </body>
+</html>

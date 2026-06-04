@@ -1,0 +1,170 @@
+:root {
+  color-scheme: dark;
+  --bg: #111113;
+  --panel: #1d1d21;
+  --panel-line: #33333a;
+  --text: #fff8fb;
+  --muted: #beb6bd;
+  --pink: #ff5fb7;
+  --pink-bright: #ff8ccc;
+  --green: #8ee86f;
+  --yellow: #ffd36a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 95, 183, 0.2), transparent 28rem),
+    linear-gradient(135deg, #111113 0%, #211a21 48%, #151a16 100%);
+}
+
+button {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  padding: 0.8rem 1.1rem;
+  color: var(--text);
+  background: #2a282d;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:hover,
+button:focus-visible {
+  border-color: rgba(255, 255, 255, 0.34);
+  background: #38343b;
+  outline: none;
+}
+
+.game-shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.game-panel {
+  width: min(100%, 720px);
+}
+
+.hud {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.hud > div {
+  min-width: 0;
+  border: 1px solid var(--panel-line);
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+  background: rgba(29, 29, 33, 0.86);
+}
+
+.hud-label {
+  display: block;
+  margin-bottom: 0.18rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.hud strong {
+  display: block;
+  min-height: 1.7rem;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: clamp(1.2rem, 4vw, 1.65rem);
+  line-height: 1.1;
+}
+
+.lives {
+  color: var(--pink-bright) !important;
+}
+
+.board-wrap {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--panel-line);
+  border-radius: 8px;
+  background: #171719;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  touch-action: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.85rem;
+  padding: 1.5rem;
+  text-align: center;
+  background: rgba(17, 17, 19, 0.74);
+  backdrop-filter: blur(3px);
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.overlay h1 {
+  margin: 0;
+  font-size: clamp(2rem, 8vw, 4.4rem);
+  line-height: 0.95;
+}
+
+.overlay p {
+  max-width: 28rem;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: clamp(1rem, 3vw, 1.18rem);
+  line-height: 1.45;
+}
+
+.overlay button {
+  justify-self: center;
+  min-width: 8rem;
+  color: #2a1020;
+  border: none;
+  background: linear-gradient(180deg, var(--pink-bright), var(--pink));
+}
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 0.9rem;
+}
+
+@media (max-width: 560px) {
+  .hud {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
