@@ -207,13 +207,37 @@ function drawSnake() {
     ctx.fill();
 
     if (isHead) {
-      ctx.fillStyle = "#2a1020";
-      ctx.beginPath();
-      ctx.arc(x + 7, y + 8, 2.2, 0, Math.PI * 2);
-      ctx.arc(x + 13, y + 8, 2.2, 0, Math.PI * 2);
-      ctx.fill();
+      drawBanana(x, y);
     }
   });
+}
+
+function drawBanana(x, y) {
+  ctx.save();
+  ctx.translate(x + 10, y + 10);
+  ctx.rotate(-0.5);
+  ctx.lineCap = "round";
+
+  ctx.strokeStyle = "#ffd36a";
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(-5, 3);
+  ctx.quadraticCurveTo(0, -6, 7, -4);
+  ctx.stroke();
+
+  ctx.strokeStyle = "#fff08a";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-4, 2);
+  ctx.quadraticCurveTo(0, -4, 6, -3);
+  ctx.stroke();
+
+  ctx.fillStyle = "#5a3a18";
+  ctx.beginPath();
+  ctx.arc(-5, 3, 1.6, 0, Math.PI * 2);
+  ctx.arc(7, -4, 1.6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
 }
 
 function drawFood() {
